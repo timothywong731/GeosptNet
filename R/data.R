@@ -38,6 +38,19 @@
 "BristolBathGraph"
 
 
-
+#' Boundaries of Postcode Sectors in South-West England as a SpatialPolygons Object
+#'
+#' A `SpatialPolygons` object containing boundaries of Postcode Sectors of the Bristol (BS) and Bath (BA) area in South-West England of the United Kingdom. 
+#'
+#' @format A `SpatialPolygons` object.
+#' 
+#' Each postcode sector has the following attributes:
+#' \describe{
+#'   \item{Name}{UK postcode sector (e.g. `BS1 1`, `BS6 5`)}
+#'   \item{Description}{Empty string value}
+#' }
+#' @examples
+#' plot(BristolBathPolygons)
 "BristolBathPolygons"
+
 "BristolBathPlaces"
