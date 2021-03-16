@@ -49,14 +49,13 @@ get_vertex_attr_aggregate <- function(g,
                                       func,
                                       ...) {
   values <- igraph::vertex_attr(g, attr)
-  by <- list(group = groups)
+  by <- base::list(group = groups)
   
-  if (length(by$group) != length(values)) {
+  if (base::length(by$group) != base::length(values)) {
     stop("Length of attributes and length of groups are not identical")
   }
-  
-  sapply(as.character(unique(by$group)),
-         function(gp){func(values[gp==by$group],...)},
-         USE.NAMES = TRUE)
+  base::sapply(base::as.character(base::unique(by$group)),
+               function(gp){func(values[gp==by$group],...)},
+               USE.NAMES = TRUE)
   
 }

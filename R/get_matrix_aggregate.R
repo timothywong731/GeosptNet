@@ -53,17 +53,17 @@ get_matrix_aggregate <- function(g,
                                  func,
                                     ...) {
   
-  if (nrow(m) != ncol(m)) {
-    stop("Matrix m needs identical number of rows and columns")
+  if (base::nrow(m) != base::ncol(m)) {
+    base::stop("Matrix m needs identical number of rows and columns")
   }
   
-  if (!all(colnames(m) == rownames(m))){
-    stop("Matrix m needs identical colnames and rownames")
+  if (!base::all(base::colnames(m) == base::rownames(m))){
+    base::stop("Matrix m needs identical colnames and rownames")
   }
   
-  sapply(as.character(unique(groups)), function(gp) {
+  base::sapply(base::as.character(base::unique(groups)), function(gp) {
     func(m
-         [vertex_attr(g, "name"), vertex_attr(g, "name")]
+         [igraph::vertex_attr(g, "name"), igraph::vertex_attr(g, "name")]
          [groups == gp, groups == gp], 
          ...) },
     USE.NAMES = TRUE)
