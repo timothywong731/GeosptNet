@@ -2,24 +2,29 @@ Package: GeosptNet
 Type: Package
 Title: Geospatial Network Analysis
 Version: 0.1.0
-Authors@R: person("Timothy", "Wong", email = "timothy.wong@hotmail.co.uk", role = c("aut", "cre"))
+Authors@R: 
+    person("Timothy", "Wong", 
+    email = "timothy.wong@hotmail.co.uk",
+    role = c("aut", "cre"),
+    comment = c(ORCID = "0000-0003-1943-6448"))
 Author: Timothy Wong [aut, cre]
 Maintainer: Timothy Wong <timothy.wong@hotmail.co.uk>
 Description: Performs geospatial network analysis such as community discovery.
 BugReports: https://github.com/timothywong731/GeosptNet/issues
+URL: https://github.com/timothywong731/GeosptNet
 License: GPL-2
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.1.1
 Imports:
     sp,
-    igraph,
+    igraph
+Suggests:
     ggplot2,
     ggnetwork,
-    knitr
-Suggests:
+    knitr,
     stringr
 Depends: 
-    R (>= 2.10)
+    R (>= 3.5.0)
 VignetteBuilder: knitr
 NeedsCompilation: no
