@@ -51,8 +51,8 @@
 #'   \item{Description}{Empty string value}
 #' }
 #' @examples
-#' dev.off()
-#' plot(BristolBathPolygons)
+#' library(sp)
+#' sp::plot(BristolBathPolygons)
 "BristolBathPolygons"
 
 
