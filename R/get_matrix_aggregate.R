@@ -10,6 +10,7 @@
 #' @examples
 #' # Use the postcode sector to derive the area
 #' # Example: BS = Bristol; BA = Bath
+#' library(igraph)
 #' library(stringr)
 #' area <- factor(str_extract(vertex_attr(BristolBathGraph, "name"),"^[A-Z]*"),
 #'                labels = c(BS="Bristol", BA="Bath"))
