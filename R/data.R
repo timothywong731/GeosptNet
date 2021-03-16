@@ -55,4 +55,18 @@
 #' plot(BristolBathPolygons)
 "BristolBathPolygons"
 
+
+
+#' Places in South-West England
+#'
+#' A `data frame` object containing several prominent towns and cities in South-West England.
+#'
+#' @format A `data frame` object.
+#' \describe{
+#'   \item{place}{City or town}
+#'   \item{lat}{Latitude}
+#'   \item{long}{Longitude}
+#' }
+#' @examples
+#' BristolBathPlaces
 "BristolBathPlaces"
