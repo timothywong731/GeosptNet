@@ -20,6 +20,7 @@ BristolBathPolygons
 A `SpatialPolygons` object containing boundaries of Postcode Sectors of the Bristol (BS) and Bath (BA) area in South-West England of the United Kingdom.
 }
 \examples{
+dev.off()
 plot(BristolBathPolygons)
 }
 \keyword{datasets}
