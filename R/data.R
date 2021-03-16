@@ -24,6 +24,7 @@
 #' @examples
 #' # Create a subgraph using the top 15 vertexes and plot it.
 #' library(igraph)
+#' library(sp)
 #' set.seed(1000)
 #' plot(induced_subgraph(BristolBathGraph, 1:15))
 #' 
@@ -50,6 +51,7 @@
 #'   \item{Description}{Empty string value}
 #' }
 #' @examples
+#' library(sp)
 #' plot(BristolBathPolygons)
 "BristolBathPolygons"
 
