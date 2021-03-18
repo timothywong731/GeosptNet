@@ -18,7 +18,7 @@
 #' library(igraph)
 #' # Create a data frame object with vertex name
 #' # `l1` is a character column indicating the top level zone in the hierarchy
-#' z <- data.frame(name = igraph::vertex_attr(BristolBathGraph, "name"),
+#' z <- data.frame(name = vertex_attr(BristolBathGraph, "name"),
 #'                 l1 = "SW England")
 #' # This will split the top level zone into smaller zones at `l2`
 #' z <-  detect_communities(z = z,
@@ -55,10 +55,11 @@
 #' # The detect_communities() function can also be chained using %>% symbol, since 
 #' # the first argument is always a `data.frame` object. Hierarchy of zones can be 
 #' # easily created in this way.
-#'
 #' # If the following example, the l2 zones with 95 percentile travel time greater
 #' # than 2 hours are split into smaller ones at l3.
-#' z <- data.frame(name = igraph::vertex_attr(BristolBathGraph, "name"),
+#' library(dplyr)
+#' library(magrittr)
+#' z <- data.frame(name = vertex_attr(BristolBathGraph, "name"),
 #'                 l1 = "SW England") %>%
 #'   detect_communities(g = BristolBathGraph,
 #'                      at_level = "l1",
