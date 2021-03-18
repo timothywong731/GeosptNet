@@ -23,8 +23,10 @@ Suggests:
     ggplot2,
     ggnetwork,
     knitr,
-    stringr
+    stringr,
+    testthat (>= 3.0.0)
 Depends: 
     R (>= 3.5.0)
 VignetteBuilder: knitr
 NeedsCompilation: no
+Config/testthat/edition: 3
