@@ -1,13 +1,13 @@
 #' @title Detect Communities in a Graph
 #' @description Runs community detection algorithm to identify communities in a graph.
-#' @param z A `data frame` object containing character column `name` which contains all vertex names in graph `g`, and at least  one named column of characters indicating zones names.
+#' @param z A `data frame` object containing character column `name` which contains all vertex names in graph `g`, and at least one named column of characters indicating zones to be split.
 #' @param g An `igraph` object
 #' @param at_level Character value indicating the level to run community detection algorithm at. The level must exist as a column of character vector in the data frame `z`.
 #' @param assign_level Character value indicating the level to assign the community detection output. 
 #' @param edge_attribute Character value which indicates the edge attribute to be used for community detection algorithm.
 #' @param allow_exit_zone Logical value indicating whether travel routes outside zonal boundary are allowed. Default value is `FALSE`. For example, if a zone is U-shaped then direct traveling between the two tips is allowed if this option is set to `TRUE`. The cost of the route is determined by the adjacency matrix `m`. Enabling this option may lead to longer compute time.
 #' @param m Optional parameter. An adjacency matrix of numeric values. The number of column and rows must be identical. All rows and columns must be named. Ideally this is a `N*N` shortest path distance matrix. This argument is only required when `allow_exit_zone` is set to `TRUE`.
-#' @param within_zones Optional parameter. Vector of characters indicating names of zones to detect community within. Default value is `NULL` which will process all zones ar the level specified in `at_level`.
+#' @param within_zones Optional parameter. Vector of characters indicating names of zones to detect community within. Default value is `NULL` which will process all zones at the level specified in `at_level`.
 #' @param max_non_adjacent_path_length Optional parameter. Integer value indicating the longest path which may connect two non-adjacent vertexes. 
 #' Please note that long path length will lead to exclaves.
 #' @param penalty A function which takes one numeric vector as input. Implements appropriate transformation and penalty. The output is used to calculate graph modularity in the algorithm. Please implement your own penalty function depending on what `edge_attribute` is being used.
@@ -57,9 +57,10 @@
 #' # the first argument is always a `data.frame` object. Hierarchy of zones can be 
 #' # easily created in this way.
 #' # If the following example, the l2 zones with 95 percentile travel time greater
-#' # than 2 hours are split into smaller ones at l3.
+#' # than 0.5 hour are split into smaller ones at l3.
 #' library(dplyr)
 #' library(magrittr)
+#' set.seed(5000)
 #' z <- data.frame(name = vertex_attr(BristolBathGraph, "name"),
 #'                 l1 = "SW England",
 #'                 stringsAsFactors = FALSE) %>%
@@ -74,15 +75,15 @@
 #'                      allow_exit_zone = TRUE,
 #'                      m = my_quickest_paths,
 #'                      within_zones = get_matrix_aggregate(
-#'                          g = BristolBathGraph,
-#'                          m = my_quickest_paths,
-#'                          groups = z[["l2"]],
-#'                          func = quantile,
-#'                          probs = 0.95,
-#'                          names = FALSE) %>% 
-#'                        extract(.>(60*60*2)) %>%
+#'                        g = BristolBathGraph,
+#'                        m = my_quickest_paths,
+#'                        groups = .[["l2"]],
+#'                        func = quantile,
+#'                        probs = 0.95,
+#'                        names = FALSE) %>% 
+#'                        extract(.>(60*60*0.5)) %>%
 #'                        names(),
-#'                      max_non_adjacent_path_length = 2)
+#'                      max_non_adjacent_path_length = 2) 
 #' @references
 #' \itemize{
 #' \item Enclave and exclave \cr

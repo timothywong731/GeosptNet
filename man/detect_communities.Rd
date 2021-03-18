@@ -18,7 +18,7 @@ detect_communities(
 )
 }
 \arguments{
-\item{z}{A `data frame` object containing character column `name` which contains all vertex names in graph `g`, and at least  one named column of characters indicating zones names.}
+\item{z}{A `data frame` object containing character column `name` which contains all vertex names in graph `g`, and at least one named column of characters indicating zones to be split.}
 
 \item{g}{An `igraph` object}
 
@@ -32,7 +32,7 @@ detect_communities(
 
 \item{m}{Optional parameter. An adjacency matrix of numeric values. The number of column and rows must be identical. All rows and columns must be named. Ideally this is a `N*N` shortest path distance matrix. This argument is only required when `allow_exit_zone` is set to `TRUE`.}
 
-\item{within_zones}{Optional parameter. Vector of characters indicating names of zones to detect community within. Default value is `NULL` which will process all zones ar the level specified in `at_level`.}
+\item{within_zones}{Optional parameter. Vector of characters indicating names of zones to detect community within. Default value is `NULL` which will process all zones at the level specified in `at_level`.}
 
 \item{max_non_adjacent_path_length}{Optional parameter. Integer value indicating the longest path which may connect two non-adjacent vertexes. 
 Please note that long path length will lead to exclaves.}
@@ -88,9 +88,10 @@ sprintf("L2 zone `\%s` has been split into several smaller zone at the next leve
 # the first argument is always a `data.frame` object. Hierarchy of zones can be 
 # easily created in this way.
 # If the following example, the l2 zones with 95 percentile travel time greater
-# than 2 hours are split into smaller ones at l3.
+# than 0.5 hour are split into smaller ones at l3.
 library(dplyr)
 library(magrittr)
+set.seed(5000)
 z <- data.frame(name = vertex_attr(BristolBathGraph, "name"),
                 l1 = "SW England",
                 stringsAsFactors = FALSE) \%>\%
@@ -105,15 +106,15 @@ z <- data.frame(name = vertex_attr(BristolBathGraph, "name"),
                      allow_exit_zone = TRUE,
                      m = my_quickest_paths,
                      within_zones = get_matrix_aggregate(
-                         g = BristolBathGraph,
-                         m = my_quickest_paths,
-                         groups = z[["l2"]],
-                         func = quantile,
-                         probs = 0.95,
-                         names = FALSE) \%>\% 
-                       extract(.>(60*60*2)) \%>\%
+                       g = BristolBathGraph,
+                       m = my_quickest_paths,
+                       groups = .[["l2"]],
+                       func = quantile,
+                       probs = 0.95,
+                       names = FALSE) \%>\% 
+                       extract(.>(60*60*0.5)) \%>\%
                        names(),
-                     max_non_adjacent_path_length = 2)
+                     max_non_adjacent_path_length = 2) 
 }
 \references{
 \itemize{
