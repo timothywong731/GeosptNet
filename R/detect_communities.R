@@ -1,6 +1,6 @@
-#' @title Detect Communities in Graph
+#' @title Detect Communities in a Graph
 #' @description Runs community detection algorithm to identify communities in a graph.
-#' @param z A `data frame` object with at least one column `name` which contains all vertex names in graph `g`.
+#' @param z A `data frame` object containing column `name` which contains all vertex names in graph `g`, and at least  one named column of characters indicating zones names.
 #' @param g An `igraph` object
 #' @param at_level Character value indicating the level to run community detection algorithm at. The level must exist as a column of character vector in the data frame `z`.
 #' @param assign_level Character value indicating the level to assign the community detection output. 
