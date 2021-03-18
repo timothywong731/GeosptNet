@@ -48,6 +48,7 @@ detect_communities <- function(z,
                                                     digest::digest))
   base::do.call(rbind,
                 base::lapply(zones, function(zone){
+                  
       # Identify all the vertexes within this zone
       v <- z[z[[at_level]]==zone,]$name
       

@@ -3,3 +3,4 @@
 export(detect_communities)
 export(get_matrix_aggregate)
 export(get_vertex_attr_aggregate)
+export(merge_communities)
