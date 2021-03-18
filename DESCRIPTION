@@ -18,7 +18,9 @@ LazyData: true
 RoxygenNote: 7.1.1
 Imports:
     sp,
-    igraph
+    igraph,
+    digest,
+    Matrix
 Suggests:
     ggplot2,
     ggnetwork,

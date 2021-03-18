@@ -15,7 +15,7 @@
 #' @return A `data frame` object
 #' @author Timothy Wong, \email{timothy.wong@@hotmail.co.uk}
 #' @examples
-#' # library(igraph)
+#' library(igraph)
 #' # Create a data frame object with vertex name
 #' # `l1` is a character column indicating the top level zone in the hierarchy
 #' z <- data.frame(name = igraph::vertex_attr(BristolBathGraph, "name"),

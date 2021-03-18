@@ -1,3 +1,30 @@
+#' @title Merge Communities in a Graph
+#' @description Merge smaller zones to create larger ones.
+#' @param z
+#' @param g
+#' @param m
+#' @param at_level
+#' @param assign_level
+#' @param vertex_attribute
+#' @param vertex_aggregate_func
+#' @param vertex_aggregate_lower_threshold
+#' @param vertex_aggregate_upper_threshold
+#' @param edge_attribute
+#' @param cost_aggregate_func
+#' @param cost_lower_threshold
+#' @param cost_upper_threshold
+#' @param within_level
+#' @param within_zones
+#' @param penalty
+#' @param cost_aggregate_args
+#' @param vertex_aggregate_args
+#' @return A `data frame` object
+#' @author Timothy Wong, \email{timothy.wong@@hotmail.co.uk}
+#' @examples
+#' 
+#' @references
+#' \itemize{
+#' }
 #' @export
 merge_communities <- function(
   z,
