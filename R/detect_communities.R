@@ -53,11 +53,11 @@
 #'         split_these_zones_further[1],
 #'         paste0(unique(subset(z, l2 == split_these_zones_further[1])$l3), collapse = ", "))
 #' 
-#' # The detect_communities() function can also be chained using %>% symbol, since 
-#' # the first argument is always a `data.frame` object. Hierarchy of zones can be 
-#' # easily created in this way.
-#' # If the following example, the l2 zones with 95 percentile travel time greater
-#' # than 0.5 hour are split into smaller ones at l3.
+#' # The `detect_communities()` function can also be chained using `%>%` symbol,
+#' # since the first argument is always a `data.frame` object. Hierarchy of 
+#' # zones can be easily created in this way. In the following example, the `l2`
+#' # zones with 95 percentile travel time greater than 0.5 hour are split into
+#' # smaller ones which will become `l3`.
 #' library(dplyr)
 #' library(magrittr)
 #' set.seed(5000)

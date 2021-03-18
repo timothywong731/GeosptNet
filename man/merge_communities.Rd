@@ -18,12 +18,52 @@ merge_communities(
   cost_aggregate_func,
   cost_lower_threshold,
   cost_upper_threshold,
-  within_level,
+  parent_level,
   within_zones = NULL,
   penalty = function(x) {     base::log(scales::rescale(-x) + 1)^0.1 },
+  vertex_aggregate_args = list(),
   cost_aggregate_args = list(),
-  vertex_aggregate_args = list()
+  verbose = TRUE
 )
+}
+\arguments{
+\item{z}{A `data frame` object containing character column `name` which contains all vertex names in graph `g`, and at least one named column of characters indicating zones to be merged.}
+
+\item{g}{An `igraph` object}
+
+\item{m}{An adjacency matrix of numeric values. The number of column and rows must be identical. All rows and columns must be named. Ideally this is a `N*N` shortest path distance matrix.}
+
+\item{at_level}{Character value indicating the level to run merge algorithm at. The level must exist as a column of character vector in the data frame `z`.}
+
+\item{assign_level}{Character value indicating the level to assign the merge algorithm output.}
+
+\item{vertex_attribute}{Character value which indicates the vertex attribute to be used for merge algorithm.}
+
+\item{vertex_aggregate_func}{Function to aggregate vertex attributes. Optional `...` parameters may be passed onto this function in `vertex_aggregate_args`.}
+
+\item{vertex_aggregate_lower_threshold}{Numeric value indicating the lower threshold of the vertex aggregate. Zones with aggregate value greater than this value will attempt to merge with an adjacent zone.}
+
+\item{vertex_aggregate_upper_threshold}{Numeric value indicating the upper threshold of the vertex aggregate. Zones with aggregate value smaller than this value will attempt to merge with an adjacent zone.}
+
+\item{edge_attribute}{Character value which indicates the edge attribute to be used for merge algorithm.}
+
+\item{cost_aggregate_func}{Function to aggregate edge attributes. Optional `...` parameters may be passed onto this function in `cost_aggregate_args`.}
+
+\item{cost_lower_threshold}{Numeric value indicating the lower threshold of the cost aggregate. Zones with aggregate value greater than this value will attempt to merge with an adjacent zone.}
+
+\item{cost_upper_threshold}{Numeric value indicating the upper threshold of the cost aggregate. Zones with aggregate value smaller than this value will attempt to merge with an adjacent zone.}
+
+\item{parent_level}{Character value indicating the parent level to stay within. Zones defined at `at_level` will attempt to merge with an adjacent zone only if the target adjacent zone shares the same parent zone at `parent_level`.}
+
+\item{within_zones}{Optional parameter. Vector of characters indicating names of zones to detect community within. Default value is `NULL` which will process all zones at the level specified in `at_level`.}
+
+\item{penalty}{A function which takes one numeric vector as input. Implements appropriate transformation and penalty. The output is used to calculate graph modularity in the algorithm. Please implement your own penalty function depending on what `edge_attribute` is being used.}
+
+\item{vertex_aggregate_args}{A named list of additional parameters to be passed onto `vertex_aggregate_func`.}
+
+\item{cost_aggregate_args}{A named list of additional parameters to be passed onto `cost_aggregate_func`.}
+
+\item{verbose}{Logical value indicating whether to print out progress and summary on the console. Default to `TRUE`.}
 }
 \value{
 A `data frame` object
@@ -32,10 +72,67 @@ A `data frame` object
 Merge smaller zones to create larger ones.
 }
 \examples{
+library(igraph)
+library(dplyr)
+library(magrittr)
+# Calculate adjacency matrix
+my_quickest_paths <- distances(graph = BristolBathGraph,
+                               weights = edge_attr(BristolBathGraph,
+                                                   "duration"))
 
+# This will split the top level zone `l1` into smaller zones at `l2`
+# The `l2` zones with 95 percentile travel time greater than 0.5 hour 
+# are split into smaller ones which will become `l4`.
+#
+# The `merge_communities()` function in this example will merge small zones
+# at `l4` back into larger ones at `l3`. It will attempt to merge `l4` zones 
+# with total population between 0-75000. Those zones will attempt to merge
+#  with the most optimally-connected adjacent zone, as indicated by the
+#  modularity function. They will only merge if the adjacency cost matrix
+# (95 percentile travel duration) is above 2 hours and below +Inf. 
+z <- data.frame(name = vertex_attr(BristolBathGraph, "name"),
+                l1 = "SW England",
+                stringsAsFactors = FALSE) \%>\%
+  detect_communities(g = BristolBathGraph,
+                     at_level = "l1",
+                     assign_level = "l2",
+                     edge_attribute = "duration") \%>\%
+  detect_communities(g = BristolBathGraph,
+                     at_level = "l2",
+                     assign_level = "l4",
+                     edge_attribute = "duration",
+                     allow_exit_zone = TRUE,
+                     m = my_quickest_paths,
+                     within_zones = get_matrix_aggregate(
+                       g = BristolBathGraph,
+                       m = my_quickest_paths,
+                       groups = .[["l2"]],
+                       func = quantile,
+                       probs = 0.95,
+                       names = FALSE) \%>\% 
+                       extract(.>(60*60*0.5)) \%>\%
+                       names(),
+                     max_non_adjacent_path_length = 2) \%>\%
+  merge_communities(g = BristolBathGraph,
+                    m = my_quickest_paths,
+                    at_level = "l4",
+                    assign_level = "l3",
+                    vertex_attribute = "population",
+                    vertex_aggregate_func = sum,
+                    vertex_aggregate_lower_threshold = 0,
+                    vertex_aggregate_upper_threshold = 75000,
+                    edge_attribute = "duration",
+                    cost_aggregate_func = quantile,
+                    cost_lower_threshold = (60*60*2),
+                    cost_upper_threshold = Inf,
+                    parent_level = "l2",
+                    cost_aggregate_args = list(probs = 0.95, 
+                                               names = FALSE))
 }
 \references{
 \itemize{
+\item Modularity \cr
+\url{https://igraph.org/r/doc/modularity.igraph.html}
 }
 }
 \author{

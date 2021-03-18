@@ -48,6 +48,9 @@ get_vertex_attr_aggregate <- function(g,
                                       groups,
                                       func,
                                       ...) {
+  if (!attr %in% igraph::list.vertex.attributes(g)) {
+    stop("Attribute does not exist in this graph")
+  }
   values <- igraph::vertex_attr(g, attr)
   by <- base::list(group = groups)
   

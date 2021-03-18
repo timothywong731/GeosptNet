@@ -61,6 +61,10 @@ get_matrix_aggregate <- function(g,
     base::stop("Matrix m needs identical colnames and rownames")
   }
   
+  if (base::length(groups) != igraph::gorder(g)) {
+    base::stop("Length of attributes and number of vertices of graph are not identical")
+  }
+  
   base::sapply(base::as.character(base::unique(groups)), function(gp) {
     func(m
          [igraph::vertex_attr(g, "name"), igraph::vertex_attr(g, "name")]
