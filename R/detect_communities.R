@@ -1,6 +1,6 @@
 #' @title Detect Communities in a Graph
 #' @description Runs community detection algorithm to identify communities in a graph.
-#' @param z A `data frame` object containing column `name` which contains all vertex names in graph `g`, and at least  one named column of characters indicating zones names.
+#' @param z A `data frame` object containing character column `name` which contains all vertex names in graph `g`, and at least  one named column of characters indicating zones names.
 #' @param g An `igraph` object
 #' @param at_level Character value indicating the level to run community detection algorithm at. The level must exist as a column of character vector in the data frame `z`.
 #' @param assign_level Character value indicating the level to assign the community detection output. 
@@ -19,7 +19,8 @@
 #' # Create a data frame object with vertex name
 #' # `l1` is a character column indicating the top level zone in the hierarchy
 #' z <- data.frame(name = vertex_attr(BristolBathGraph, "name"),
-#'                 l1 = "SW England")
+#'                 l1 = "SW England",
+#'                 stringsAsFactors = FALSE)
 #' # This will split the top level zone into smaller zones at `l2`
 #' z <-  detect_communities(z = z,
 #'                          g = BristolBathGraph,
@@ -60,7 +61,8 @@
 #' library(dplyr)
 #' library(magrittr)
 #' z <- data.frame(name = vertex_attr(BristolBathGraph, "name"),
-#'                 l1 = "SW England") %>%
+#'                 l1 = "SW England",
+#'                 stringsAsFactors = FALSE) %>%
 #'   detect_communities(g = BristolBathGraph,
 #'                      at_level = "l1",
 #'                      assign_level = "l2",

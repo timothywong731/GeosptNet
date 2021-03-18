@@ -49,7 +49,7 @@ Runs community detection algorithm to identify communities in a graph.
 library(igraph)
 # Create a data frame object with vertex name
 # `l1` is a character column indicating the top level zone in the hierarchy
-z <- data.frame(name = vertex_attr(BristolBathGraph, "name"),
+z <- data.frame(name = as.character(vertex_attr(BristolBathGraph, "name")),
                 l1 = "SW England")
 # This will split the top level zone into smaller zones at `l2`
 z <-  detect_communities(z = z,
@@ -90,7 +90,7 @@ sprintf("L2 zone `\%s` has been split into several smaller zone at the next leve
 # than 2 hours are split into smaller ones at l3.
 library(dplyr)
 library(magrittr)
-z <- data.frame(name = vertex_attr(BristolBathGraph, "name"),
+z <- data.frame(name = as.character(vertex_attr(BristolBathGraph, "name")),
                 l1 = "SW England") \%>\%
   detect_communities(g = BristolBathGraph,
                      at_level = "l1",

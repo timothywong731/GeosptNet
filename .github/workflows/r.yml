@@ -32,6 +32,6 @@ jobs:
           install.packages(c("remotes", "rcmdcheck", "knitr"))
           remotes::install_deps(dependencies = TRUE)
         shell: Rscript {0}
-      - name: R CMS check (as CRAN)
+      - name: R CMD check
         run: rcmdcheck::rcmdcheck(args = "--no-manual", error_on = "error")
         shell: Rscript {0}
