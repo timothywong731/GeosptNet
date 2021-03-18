@@ -9,7 +9,7 @@ get_matrix_aggregate(g, m, groups, func, ...)
 \arguments{
 \item{g}{An `igraph` object}
 
-\item{m}{A matrix of numeric values. The number of column and rows must be identical. All rows and columns must be named. Ideally this is a `N*N` shortest path distance matrix.}
+\item{m}{An adjacency matrix of numeric values. The number of column and rows must be identical. All rows and columns must be named. Ideally this is a `N*N` shortest path distance matrix.}
 
 \item{groups}{Vector of character or factor, which indicate the groups to be aggregated}
 

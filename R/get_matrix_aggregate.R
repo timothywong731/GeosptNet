@@ -1,7 +1,7 @@
 #' @title Compute Aggregate of Matrix Values
 #' @description Calculate the group by aggregate of a matrix
 #' @param g An `igraph` object
-#' @param m A matrix of numeric values. The number of column and rows must be identical. All rows and columns must be named. Ideally this is a `N*N` shortest path distance matrix.
+#' @param m An adjacency matrix of numeric values. The number of column and rows must be identical. All rows and columns must be named. Ideally this is a `N*N` shortest path distance matrix.
 #' @param groups Vector of character or factor, which indicate the groups to be aggregated
 #' @param func Aggregation function
 #' @param ... Optional arguments to be passed onto the aggregation function
