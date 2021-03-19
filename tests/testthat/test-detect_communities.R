@@ -86,3 +86,37 @@ test_that("Name column not equal length", {
     edge_attribute = "duration"),
     regexp = "The name column in data frame z and vertex name of graph g must be the same")
 })
+
+test_that("within_zones is non-NULL", {
+  # Arrange
+  z <- data.frame(name = vertex_attr(BristolBathGraph, "name"),
+                  l1 = c(rep("A",200), rep("B",45)),
+                  stringsAsFactors = FALSE)
+  
+  # Action
+  z <-  detect_communities(z = z,
+                           g = BristolBathGraph,
+                           at_level = "l1",
+                           assign_level = "l2",
+                           edge_attribute = "duration",
+                           within_zones = "A")
+  
+  # Assert
+  expect_type(object = z,
+              type = "list")
+  expect_vector(object = z$name,
+                ptype = character(),
+                size = 245L)
+  expect_vector(object = z$l1,
+                ptype = character(),
+                size = 245L)
+  expect_vector(object = z$l2,
+                ptype = character(),
+                size = 245L)
+  expect_length(object = unique(z$l1),
+                n = 2L)
+  expect_length(object = length(unique(subset(z, l1=="B")$l2)),
+                n = 1L)
+  expect_gt(object = length(unique(subset(z, l1=="A")$l2)),
+            expected = 1L)
+})
