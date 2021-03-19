@@ -51,10 +51,18 @@ test_that("Communities detection", {
                    expected = 166L)
   expect_identical(object = sum(table(z$l2,  z$l1)[,2]),
                    expected = 79L)
+  expect_identical(object = sum(table(z$l2,  z$l1)[,1] == 0),
+                   expected = 3L)
+  expect_identical(object = sum(table(z$l2,  z$l1)[,2] == 0),
+                   expected = 6L)
   expect_identical(object = sum(table(z$l3,  z$l1)[,1]),
                    expected = 166L)
   expect_identical(object = sum(table(z$l3,  z$l1)[,2]),
                    expected = 79L)
+  expect_identical(object = sum(table(z$l3,  z$l1)[,1] == 0),
+                   expected = 8L)
+  expect_identical(object = sum(table(z$l3,  z$l1)[,2] == 0),
+                   expected = 8L)
   expect_vector(object = unique(subset(z,l1==1)$l2),
                 ptype = character(),
                 size = 6L)
