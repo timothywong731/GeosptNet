@@ -175,6 +175,46 @@ test_that("Simple matrix aggregation, with function outputing named vector of le
                expected = c(7387.1, 7803.6))
 })
 
+test_that("Wrong matrix size", {
+  # Arrange
+  library(igraph)
+  my_quickest_paths <- distances(graph = BristolBathGraph,
+                                 weights = edge_attr(BristolBathGraph,
+                                                     "duration"))
+  
+  # Action
+  # Assert
+  expect_error(
+    object = get_matrix_aggregate(
+      g = BristolBathGraph,
+      m = my_quickest_paths[1:5,1:10],
+      groups = c(rep("A",200), rep("B",45)),
+      func = max
+    ),
+    regexp = "Matrix m needs identical number of rows and columns")
+})
+
+
+test_that("Wrong matrix row and column names", {
+  # Arrange
+  library(igraph)
+  my_quickest_paths <- distances(graph = BristolBathGraph,
+                                 weights = edge_attr(BristolBathGraph,
+                                                     "duration"))
+  rownames(my_quickest_paths) <- rev(rownames(my_quickest_paths))
+    
+  # Action
+  # Assert
+  expect_error(
+    object = get_matrix_aggregate(
+      g = BristolBathGraph,
+      m = my_quickest_paths,
+      groups = c(rep("A",200), rep("B",45)),
+      func = max
+    ),
+    regexp = "Matrix m needs identical colnames and rownames")
+})
+
 
 test_that("Incorrect groups - NULL value", {
   # Arrange
