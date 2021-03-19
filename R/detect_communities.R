@@ -183,7 +183,8 @@ detect_communities <- function(z,
       
       # Assign the new hash values to the assign_level
       result <- base::with(z, {
-        id <- base::match(v, z$name)
+        id <- base::match(x = v, 
+                          table = z$name)
         z[id, assign_level] <- membership
         return(z[id,])
       })
@@ -193,10 +194,13 @@ detect_communities <- function(z,
   
   # Result may contain a subset of vertexes if within_zones is set to non-NULL
   # Need to combine with the remaining data
-  result <- base::rbind(z[base::match(base::setdiff(z[["name"]], result[["name"]]), z[["name"]]),],
-        result)
+  result <- base::rbind(
+    z[base::match(
+      table = z[["name"]],
+      x = base::setdiff(z[["name"]], result[["name"]])),], result)
   
   # The result must be sorted before returning
   # The vertex name column should be same as the on in graph object
-  return(result[base::match(result[["name"]], igraph::vertex_attr(g, "name")),])
+  return(result[base::match(x = igraph::vertex_attr(g, "name"),
+                            table = result[["name"]]),])
 }
