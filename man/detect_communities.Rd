@@ -114,7 +114,7 @@ z <- data.frame(name = vertex_attr(BristolBathGraph, "name"),
                        names = FALSE) \%>\% 
                        extract(.>(60*60*0.5)) \%>\%
                        names(),
-                     max_non_adjacent_path_length = 2) 
+                     max_non_adjacent_path_length = 2)
 }
 \references{
 \itemize{

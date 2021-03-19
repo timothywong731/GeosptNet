@@ -1,8 +1,8 @@
 library(GeosptNet)
+library(igraph)
 
 test_that("Simple matrix aggregation", {
   # Arrange
-  library(igraph)
   my_quickest_paths <- distances(graph = BristolBathGraph,
                                  weights = edge_attr(BristolBathGraph,
                                                      "duration"))
@@ -27,7 +27,6 @@ test_that("Simple matrix aggregation", {
 
 test_that("Incorrect graph size", {
   # Arrange
-  library(igraph)
   my_quickest_paths <- distances(graph = BristolBathGraph,
                                  weights = edge_attr(BristolBathGraph,
                                                      "duration"))
@@ -46,7 +45,6 @@ test_that("Incorrect graph size", {
 
 test_that("Simple matrix aggregation, with function outputing named vector", {
   # Arrange
-  library(igraph)
   my_quickest_paths <- distances(graph = BristolBathGraph,
                                  weights = edge_attr(BristolBathGraph,
                                                      "duration"))
@@ -85,7 +83,6 @@ test_that("Simple matrix aggregation, with function outputing named vector", {
 
 test_that("Simple matrix aggregation, with function outputing unnamed vector", {
   # Arrange
-  library(igraph)
   my_quickest_paths <- distances(graph = BristolBathGraph,
                                  weights = edge_attr(BristolBathGraph,
                                                      "duration"))
@@ -124,7 +121,6 @@ test_that("Simple matrix aggregation, with function outputing unnamed vector", {
 
 test_that("Simple matrix aggregation, with function outputing unnamed vector of length 1", {
   # Arrange
-  library(igraph)
   my_quickest_paths <- distances(graph = BristolBathGraph,
                                  weights = edge_attr(BristolBathGraph,
                                                      "duration"))
@@ -151,7 +147,6 @@ test_that("Simple matrix aggregation, with function outputing unnamed vector of 
 
 test_that("Simple matrix aggregation, with function outputing named vector of length 1", {
   # Arrange
-  library(igraph)
   my_quickest_paths <- distances(graph = BristolBathGraph,
                                  weights = edge_attr(BristolBathGraph,
                                                      "duration"))
@@ -177,7 +172,6 @@ test_that("Simple matrix aggregation, with function outputing named vector of le
 
 test_that("Wrong matrix size", {
   # Arrange
-  library(igraph)
   my_quickest_paths <- distances(graph = BristolBathGraph,
                                  weights = edge_attr(BristolBathGraph,
                                                      "duration"))
@@ -197,7 +191,6 @@ test_that("Wrong matrix size", {
 
 test_that("Wrong matrix row and column names", {
   # Arrange
-  library(igraph)
   my_quickest_paths <- distances(graph = BristolBathGraph,
                                  weights = edge_attr(BristolBathGraph,
                                                      "duration"))
@@ -218,7 +211,6 @@ test_that("Wrong matrix row and column names", {
 
 test_that("Incorrect groups - NULL value", {
   # Arrange
-  library(igraph)
   my_quickest_paths <- distances(graph = BristolBathGraph,
                                  weights = edge_attr(BristolBathGraph,
                                                      "duration"))
@@ -236,7 +228,6 @@ test_that("Incorrect groups - NULL value", {
 
 test_that("Incorrect groups - empty vector", {
   # Arrange
-  library(igraph)
   my_quickest_paths <- distances(graph = BristolBathGraph,
                                  weights = edge_attr(BristolBathGraph,
                                                      "duration"))
@@ -255,7 +246,6 @@ test_that("Incorrect groups - empty vector", {
 
 test_that("Ccustom function does not take any input", {
   # Arrange
-  library(igraph)
   my_quickest_paths <- distances(graph = BristolBathGraph,
                                  weights = edge_attr(BristolBathGraph,
                                                      "duration"))
@@ -274,7 +264,6 @@ test_that("Ccustom function does not take any input", {
 
 test_that("Custom function does not return any output", {
   # Arrange
-  library(igraph)
   my_quickest_paths <- distances(graph = BristolBathGraph,
                                  weights = edge_attr(BristolBathGraph,
                                                      "duration"))
