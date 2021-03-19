@@ -392,3 +392,24 @@ test_that("custom penalty function returns short output", {
                                 penalty = function(x) { return(runif(100)) }),
     regexp = "multi-level community detection: weight vector too short, Invalid value")
 })
+
+
+test_that("Ensure result is correctly sorted", {
+  # Arrange
+  z <- data.frame(name = vertex_attr(BristolBathGraph, "name"),
+                  l1 = "SW England",
+                  stringsAsFactors = FALSE)
+  
+  # Action
+  z <-  detect_communities(z = z,
+                           g = BristolBathGraph,
+                           at_level = "l1",
+                           assign_level = "l2",
+                           edge_attribute = "duration")
+  
+  # Assert
+  expect_identical(
+    object = z$name,
+    expected = vertex_attr(BristolBathGraph, "name"))
+})
+
