@@ -113,6 +113,22 @@ detect_communities <- function(z,
     }
   }
   
+  if (max_non_adjacent_path_length < 1) {
+    base::stop("max_non_adjacent_path_length must be greater then or equal to 1")
+  }
+  
+  if (assign_level == at_level) {
+    base::stop("assign_level and at_level cannot be identical")
+  }
+  
+  if (assign_level == "name" | at_level == "name") {
+    base::stop("assign_level and at_level cannot be 'name'")
+  }
+  
+  if (!edge_attribute %in% igraph::list.edge.attributes(g)) {
+    base::stop("edge_attribute does not exist in graph")
+  }
+  
   # Identify all zones at this level
   zones <- base::unique(z[[at_level]])
   
@@ -177,10 +193,10 @@ detect_communities <- function(z,
   
   # Result may contain a subset of vertexes if within_zones is set to non-NULL
   # Need to combine with the remaining data
-  result <- rbind(z[match(setdiff(z[["name"]], result[["name"]]), z[["name"]]),],
+  result <- base::rbind(z[base::match(base::setdiff(z[["name"]], result[["name"]]), z[["name"]]),],
         result)
   
   # The result must be sorted before returning
   # The vertex name column should be same as the on in graph object
-  return(result[match(result[["name"]], igraph::vertex_attr(g, "name")),])
+  return(result[base::match(result[["name"]], igraph::vertex_attr(g, "name")),])
 }
