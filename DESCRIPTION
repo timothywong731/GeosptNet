@@ -21,6 +21,7 @@ Imports:
     digest,
     Matrix
 Suggests:
+    sp,
     ggplot2,
     ggnetwork,
     knitr,
