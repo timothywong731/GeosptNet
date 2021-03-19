@@ -31,12 +31,12 @@ jobs:
           r-version: ${{ matrix.r-version }}
       - name: Install dependencies
         run: |
-          install.packages(c("remotes", "rcmdcheck", "knitr", "covr"))
+          install.packages(c("remotes", "rcmdcheck", "knitr", "covr", "xml2"))
           remotes::install_deps(dependencies = TRUE)
         shell: Rscript {0}
       - name: R CMD check
         run: rcmdcheck::rcmdcheck(args = "--no-manual", error_on = "error")
         shell: Rscript {0}
-      - name: Code converage
+      - name: Code coverage
         run: covr::codecov(token = "${{ secrets.COVERALL_REPO_TOKEN }}")
         shell: Rscript {0}
