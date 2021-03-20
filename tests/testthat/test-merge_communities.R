@@ -1144,7 +1144,7 @@ test_that("Merging islands", {
                   l3 = c(2,2,2,2,3,3,3,3,4),
                   stringsAsFactors = FALSE)
   
-  m <- distances(graph = g, weights = edge_attr(g,"value"))
+  m <- distances(graph = g, weights = edge_attr(g,"edge_value"))
   
   # Action
   z <- merge_communities(
@@ -1171,4 +1171,60 @@ test_that("Merging islands", {
     object = unique(z$l2),
     ptype = character(),
     size = 2L)
+})
+
+
+test_that("Checking cost threshold limits", {
+  # Arrange
+  g <- graph_from_literal(A--B, B--C, C--D, C--A, D--A, D--B,
+                          A--E,
+                          E--F, F--G, G--H, G--E, H--E, H--F, I)
+  edge_attr(g, "edge_value") <- c(1,1,1,50,1,1,
+                                  1,1,1,1,1,1,1)
+  vertex_attr(g,"vertex_value") <- c(2,2,2,2,3,3,3,3,1)
+  
+  z <- data.frame(name = vertex_attr(g,"name"),
+                  l1 = c(1,1,1,1,1,1,1,1,1),
+                  l3 = c(2,2,2,2,3,3,3,3,4),
+                  stringsAsFactors = FALSE)
+  
+  m <- distances(graph = g, weights = edge_attr(g,"edge_value"))
+  
+  # Action
+  z <- merge_communities(
+    z = z,
+    g = g,
+    m = m,
+    at_level = "l3",
+    assign_level = "l2",
+    vertex_attribute = "vertex_value",
+    vertex_aggregate_func = sum,
+    vertex_aggregate_lower_threshold = 0,
+    vertex_aggregate_upper_threshold = 100,
+    edge_attribute = "edge_value",
+    cost_aggregate_func = max,
+    cost_lower_threshold = 100,
+    cost_upper_threshold = 200,
+    parent_level = "l1",
+    vertex_aggregate_args = list(na.rm = TRUE),
+    penalty = function(x){return(x)},
+    verbose = FALSE)
+  
+  # Assert
+  expect_vector(
+    object = unique(z$l2),
+    ptype = character(),
+    size = 3L)
+  expect_vector(
+    object = unique(subset(z, l3==2)$l2),
+    ptype = character(),
+    size = 1L)
+  expect_vector(
+    object = unique(subset(z, l3==3)$l2),
+    ptype = character(),
+    size = 1L)
+  expect_vector(
+    object = unique(subset(z, l3==4)$l2),
+    ptype = character(),
+    size = 1L)
 })

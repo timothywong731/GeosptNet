@@ -253,7 +253,7 @@ merge_communities <- function(
         
         break
       } else{
-        # Move to next zone if cost is above cost_threshold
+        # Move to next zone if cost is below cost_lower_threshold or above cost_upper_threshold
         # Do not merge
         next
       }
