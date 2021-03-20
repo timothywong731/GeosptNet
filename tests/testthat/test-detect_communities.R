@@ -27,7 +27,10 @@ test_that("Communities detection", {
                 ptype = character(),
                 size = 245L)
   expect_length(object = unique(z$l2),
-                n = 10L)
+                n = 17L)
+  expect_identical(
+    object = z$name,
+    expected = vertex_attr(BristolBathGraph, "name"))
 })
 
 
@@ -68,7 +71,7 @@ test_that("Name column not identical", {
 })
 
 
-test_that("Name column not equal length", {
+test_that("Data frame not equal length", {
   # Arrange
   z <- data.frame(name = sample(LETTERS,size = 145L,replace = TRUE),
                   l1 = "SW England",
@@ -90,7 +93,7 @@ test_that("Name column not equal length", {
 test_that("within_zones is non-NULL", {
   # Arrange
   z <- data.frame(name = vertex_attr(BristolBathGraph, "name"),
-                  l1 = c(rep("A",200), rep("B",45)),
+                  l1 = c(2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,1,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,1,1,1,2,1,2,2,2,2,2,2,2,2,2,1,2,2,1,1,1,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,1,2,2,2,2,2,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,1,2,2,1,1,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1),
                   stringsAsFactors = FALSE)
   
   # Action
@@ -99,7 +102,7 @@ test_that("within_zones is non-NULL", {
                            at_level = "l1",
                            assign_level = "l2",
                            edge_attribute = "duration",
-                           within_zones = "A")
+                           within_zones = 1)
   
   # Assert
   expect_type(object = z,
@@ -108,24 +111,25 @@ test_that("within_zones is non-NULL", {
                 ptype = character(),
                 size = 245L)
   expect_vector(object = z$l1,
-                ptype = character(),
                 size = 245L)
   expect_vector(object = z$l2,
                 ptype = character(),
                 size = 245L)
   expect_length(object = unique(z$l1),
                 n = 2L)
-  expect_length(object = length(unique(subset(z, l1=="B")$l2)),
-                n = 1L)
-  expect_gt(object = length(unique(subset(z, l1=="A")$l2)),
-            expected = 1L)
+  expect_vector(object = unique(subset(z, l1==1)$l2),
+                ptype = character(),
+                size = 13L)
+  expect_vector(object = unique(subset(z, l1!=1)$l2),
+                ptype = character(),
+                size = 1L)
 })
 
 
 test_that("within_zones not exist in the data frame", {
   # Arrange
   z <- data.frame(name = vertex_attr(BristolBathGraph, "name"),
-                  l1 = c(rep("A",200), rep("B",45)),
+                  l1 = c(2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,1,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,1,1,1,2,1,2,2,2,2,2,2,2,2,2,1,2,2,1,1,1,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,1,2,2,2,2,2,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,1,2,2,1,1,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1),
                   stringsAsFactors = FALSE)
   
   # Action
@@ -143,7 +147,6 @@ test_that("within_zones not exist in the data frame", {
                 ptype = character(),
                 size = 245L)
   expect_vector(object = z$l1,
-                ptype = character(),
                 size = 245L)
   expect_vector(object = z$l2,
                 ptype = character(),
@@ -152,9 +155,9 @@ test_that("within_zones not exist in the data frame", {
                 n = 2L)
   expect_length(object = unique(z$l2),
                 n = 2L)
-  expect_length(object = length(unique(subset(z, l1=="B")$l2)),
+  expect_length(object = length(unique(subset(z, l1==1)$l2)),
                 n = 1L)
-  expect_length(object = length(unique(subset(z, l1=="A")$l2)),
+  expect_length(object = length(unique(subset(z, l1==2)$l2)),
                 n = 1L)
 })
 
@@ -162,7 +165,7 @@ test_that("within_zones not exist in the data frame", {
 test_that("allow_exit_zone is TRUE", {
   # Arrange
   z <- data.frame(name = vertex_attr(BristolBathGraph, "name"),
-                  l1 = c(rep("A",200), rep("B",45)),
+                  l1 = c(2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,1,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,1,1,1,2,1,2,2,2,2,2,2,2,2,2,1,2,2,1,1,1,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,1,2,2,2,2,2,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,1,2,2,1,1,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1),
                   stringsAsFactors = FALSE)
   
   my_quickest_paths <- distances(graph = BristolBathGraph,
@@ -186,30 +189,30 @@ test_that("allow_exit_zone is TRUE", {
                 ptype = character(),
                 size = 245L)
   expect_vector(object = z$l1,
-                ptype = character(),
                 size = 245L)
   expect_vector(object = z$l2,
                 ptype = character(),
                 size = 245L)
   expect_length(object = unique(z$l1),
                 n = 2L)
-  expect_gt(object = length(unique(subset(z, l1=="B")$l2)),
-            expected = 1L)
-  expect_gt(object = length(unique(subset(z, l1=="A")$l2)),
-            expected = 1L)
+  expect_vector(object = unique(subset(z, l1==2)$l2),
+                ptype = character(),
+                size = 8L)
+  expect_vector(object = unique(subset(z, l1==1)$l2),
+                ptype = character(),
+                size = 7L)
 })
 
 
 test_that("wrong matrix size", {
   # Arrange
   z <- data.frame(name = vertex_attr(BristolBathGraph, "name"),
-                  l1 = c(rep("A",200), rep("B",45)),
+                  l1 = "SW England",
                   stringsAsFactors = FALSE)
   
   my_quickest_paths <- distances(graph = BristolBathGraph,
                                  weights = edge_attr(BristolBathGraph,
-                                                     "duration"))
-  my_quickest_paths <- my_quickest_paths[1:5, 1:10]
+                                                     "duration"))[1:5, 1:10]
   
   # Action
   # Assert
@@ -229,7 +232,7 @@ test_that("wrong matrix size", {
 test_that("max_non_adjacent_path_length less than 1", {
   # Arrange
   z <- data.frame(name = vertex_attr(BristolBathGraph, "name"),
-                  l1 = c(rep("A",200), rep("B",45)),
+                  l1 = "SW England",
                   stringsAsFactors = FALSE)
   
   my_quickest_paths <- distances(graph = BristolBathGraph,
@@ -253,7 +256,7 @@ test_that("max_non_adjacent_path_length less than 1", {
 test_that("Incorrect assign_level", {
   # Arrange
   z <- data.frame(name = vertex_attr(BristolBathGraph, "name"),
-                  l1 = c(rep("A",200), rep("B",45)),
+                  l1 = "SW England",
                   stringsAsFactors = FALSE)
   
   my_quickest_paths <- distances(graph = BristolBathGraph,
@@ -276,7 +279,7 @@ test_that("Incorrect assign_level", {
 test_that("assign_level equal to 'name'", {
   # Arrange
   z <- data.frame(name = vertex_attr(BristolBathGraph, "name"),
-                  l1 = c(rep("A",200), rep("B",45)),
+                  l1 = "SW England",
                   stringsAsFactors = FALSE)
   
   my_quickest_paths <- distances(graph = BristolBathGraph,
@@ -299,7 +302,7 @@ test_that("assign_level equal to 'name'", {
 test_that("at_level equal to 'name'", {
   # Arrange
   z <- data.frame(name = vertex_attr(BristolBathGraph, "name"),
-                  l1 = c(rep("A",200), rep("B",45)),
+                  l1 = "SW England",
                   stringsAsFactors = FALSE)
   
   my_quickest_paths <- distances(graph = BristolBathGraph,
@@ -322,7 +325,7 @@ test_that("at_level equal to 'name'", {
 test_that("edge_attribute not exist", {
   # Arrange
   z <- data.frame(name = vertex_attr(BristolBathGraph, "name"),
-                  l1 = c(rep("A",200), rep("B",45)),
+                  l1 = "SW England",
                   stringsAsFactors = FALSE)
   
   # Action
@@ -339,7 +342,7 @@ test_that("edge_attribute not exist", {
 test_that("custom penalty function does not take any input", {
   # Arrange
   z <- data.frame(name = vertex_attr(BristolBathGraph, "name"),
-                  l1 = c(rep("A",200), rep("B",45)),
+                  l1 = "SW England",
                   stringsAsFactors = FALSE)
   
   # Action
@@ -357,7 +360,7 @@ test_that("custom penalty function does not take any input", {
 test_that("custom penalty function does not return any output", {
   # Arrange
   z <- data.frame(name = vertex_attr(BristolBathGraph, "name"),
-                  l1 = c(rep("A",200), rep("B",45)),
+                  l1 = "SW England",
                   stringsAsFactors = FALSE)
   
   # Action
@@ -369,16 +372,17 @@ test_that("custom penalty function does not return any output", {
                                penalty = function(x) { return() })
   
   # Assert
-  expect_length(
+  expect_vector(
     object = unique(result$l2),
-    n = 58)
+    ptype = character(),
+    size = 10L)
 })
 
 
 test_that("custom penalty function returns short output", {
   # Arrange
   z <- data.frame(name = vertex_attr(BristolBathGraph, "name"),
-                  l1 = c(rep("A",200), rep("B",45)),
+                  l1 = "SW England",
                   stringsAsFactors = FALSE)
   
   # Action
@@ -392,24 +396,3 @@ test_that("custom penalty function returns short output", {
                                 penalty = function(x) { return(runif(100)) }),
     regexp = "multi-level community detection: weight vector too short, Invalid value")
 })
-
-
-test_that("Ensure result is correctly sorted", {
-  # Arrange
-  z <- data.frame(name = vertex_attr(BristolBathGraph, "name"),
-                  l1 = "SW England",
-                  stringsAsFactors = FALSE)
-  
-  # Action
-  z <-  detect_communities(z = z,
-                           g = BristolBathGraph,
-                           at_level = "l1",
-                           assign_level = "l2",
-                           edge_attribute = "duration")
-  
-  # Assert
-  expect_identical(
-    object = z$name,
-    expected = vertex_attr(BristolBathGraph, "name"))
-})
-
