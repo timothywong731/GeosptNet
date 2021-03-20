@@ -14,7 +14,7 @@ detect_communities(
   m = NULL,
   within_zones = NULL,
   max_non_adjacent_path_length = 2,
-  penalty = function(x) {     base::log(scales::rescale(-x) + 1)^0.1 }
+  penalty = function(x) {     base::log(scales::rescale(-x) + 1)^6 }
 )
 }
 \arguments{

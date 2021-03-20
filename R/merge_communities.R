@@ -100,11 +100,49 @@ merge_communities <- function(
   cost_upper_threshold,
   parent_level,
   within_zones = NULL,
-  penalty = function(x){ base::log(scales::rescale(-x)+1)^0.1 },
+  penalty = function(x){ base::log(scales::rescale(-x)+1)^6 },
   vertex_aggregate_args = list(),
   cost_aggregate_args = list(),
   verbose = TRUE
 ){
+  
+  
+  if(!"name" %in% names(z)){
+    base::stop("The data frame z must vertex name in the `name` column")
+  } else {
+    if (!base::identical(base::sort(z$name), 
+                         base::sort(igraph::vertex_attr(g, "name")))) {
+      base::stop("The name column in data frame z and vertex name of graph g must be the same")
+    }
+  }
+  
+  if (assign_level == at_level | parent_level == at_level | parent_level == assign_level) {
+    base::stop("assign_level, at_level and parent_level must be different")
+  }
+  
+  if (assign_level == "name" | at_level == "name") {
+    base::stop("assign_level and at_level cannot be 'name'")
+  }
+  
+  if (!edge_attribute %in% igraph::list.edge.attributes(g)) {
+    base::stop("edge_attribute does not exist in graph")
+  }
+  
+  if (!vertex_attribute %in% igraph::list.vertex.attributes(g)) {
+    base::stop("vertex_attribute does not exist in graph")
+  }
+  
+  if (vertex_aggregate_lower_threshold > vertex_aggregate_upper_threshold) {
+    base::stop("vertex_aggregate_lower_threshold must be smaller than vertex_aggregate_upper_threshold")
+  }
+  
+  if (cost_lower_threshold > cost_upper_threshold) {
+    base::stop("cost_lower_threshold must be smaller than cost_upper_threshold")
+  }
+  
+  if(!parent_level %in% names(z)){
+    base::stop("parent_level does not exist in data frame z")
+  }
   
   # Create hash value for the assign_level
   z[[assign_level]] <- base::as.vector(base::sapply(base::as.character(z[[at_level]]), 

@@ -20,7 +20,7 @@ merge_communities(
   cost_upper_threshold,
   parent_level,
   within_zones = NULL,
-  penalty = function(x) {     base::log(scales::rescale(-x) + 1)^0.1 },
+  penalty = function(x) {     base::log(scales::rescale(-x) + 1)^6 },
   vertex_aggregate_args = list(),
   cost_aggregate_args = list(),
   verbose = TRUE

@@ -101,9 +101,8 @@ detect_communities <- function(z,
                                m = NULL,
                                within_zones = NULL,
                                max_non_adjacent_path_length = 2,
-                               penalty = function(x) { base::log(scales::rescale(-x)+1)^0.1 }) {
+                               penalty = function(x){ base::log(scales::rescale(-x)+1)^6 }) {
   
-  # If the vertex names are not present in the z data frame, create it
   if(!"name" %in% names(z)){
     base::stop("The data frame z must vertex name in the `name` column")
   } else {
