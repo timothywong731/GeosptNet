@@ -59,7 +59,7 @@
 
 #' Places in South-West England
 #'
-#' A `data frame` object containing several prominent towns and cities in South-West England.
+#' A `data frame` object containing several prominent towns and cities in South-West England. This data was extracted from OpenStreetMap.
 #'
 #' @format A `data frame` object.
 #' \describe{
@@ -69,4 +69,9 @@
 #' }
 #' @examples
 #' BristolBathPlaces
+#' @references
+#' \itemize{
+#' \item Overpass API for OpenStreetMap Data \cr
+#' \url{https://wiki.openstreetmap.org/wiki/Overpass_API}
+#' }
 "BristolBathPlaces"
