@@ -28,7 +28,8 @@ Suggests:
     stringr,
     testthat (>= 3.0.0),
     magrittr,
-    dplyr
+    dplyr,
+    rmarkdown
 Depends: 
     R (>= 3.5.0)
 VignetteBuilder: knitr
