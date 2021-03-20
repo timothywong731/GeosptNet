@@ -1089,3 +1089,86 @@ test_that("Additional argument for vertex_aggregate_args", {
                 ptype = character(),
                 size = 1L)
 })
+
+
+test_that("Set verbose=TRUE", {
+  # Arrange
+  z <- data.frame(name = vertex_attr(BristolBathGraph, "name"),
+                  l1 = c(2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,1,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,1,1,1,2,1,2,2,2,2,2,2,2,2,2,1,2,2,1,1,1,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,1,2,2,2,2,2,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,1,2,2,1,1,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1),
+                  l3 = c(1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,3,3,3,4,5,5,5,5,4,4,4,6,6,4,4,7,6,7,7,6,6,6,6,6,4,4,4,8,8,8,9,9,9,9,1,3,10,10,10,10,10,10,10,4,4,9,4,4,11,11,9,5,11,11,12,12,12,12,12,12,12,12,12,12,12,12,12,13,13,13,12,12,12,12,12,12,12,12,14,14,14,14,14,14,14,14,15,14,14,15,15,15,15,15,13,13,13,13,13,13,13,13,13,13,13,3,12,3,3,3,3,3,3,3,12,3,3,3,3,3,14,14,14,16,3,14,16,16,16,12,12,12,15,15,15,12,15,9,15,9,11,11,9,9,9,11,11,11,11,11,11,11,11,11,11,11,9,11,9,3,14,16,12,16,16,16,16,16,16,9,9,4,12,1,2,8,6,2,3,5,4,5,5,4,7,6,6,4,7,6,4,4,8,3,3,10,4,11,11,5,11,11,12,13,12,14,12,12,12,15,13,14,14,14,14,14,16,15,13,9,3,3,16,15,15,9,11,16,16),
+                  stringsAsFactors = FALSE)
+  
+  my_quickest_paths <- distances(graph = BristolBathGraph,
+                                 weights = edge_attr(BristolBathGraph,
+                                                     "duration"))
+  
+  # Action
+  
+  
+  # Assert
+  expect_output(
+    object = merge_communities(
+      z = z,
+      g = BristolBathGraph,
+      m = my_quickest_paths,
+      at_level = "l3",
+      assign_level = "l2",
+      vertex_attribute = "population",
+      vertex_aggregate_func = sum,
+      vertex_aggregate_lower_threshold = 0,
+      vertex_aggregate_upper_threshold = 100000,
+      edge_attribute = "duration",
+      cost_aggregate_func = quantile,
+      cost_lower_threshold = 60*60*0.1,
+      cost_upper_threshold = Inf,
+      parent_level = "l1",
+      cost_aggregate_args = list(probs=0.95,
+                                 names=FALSE),
+      vertex_aggregate_args = list(na.rm = TRUE),
+      verbose = TRUE),
+    regexp = ".......\nTotal zones merged: 7")
+})
+
+
+test_that("Merging islands", {
+  # Arrange
+  g <- graph_from_literal(A--B, B--C, C--D, C--A, D--A, D--B,
+                          A--E,
+                          E--F, F--G, G--H, G--E, H--E, H--F, I)
+  edge_attr(g, "edge_value") <- c(1,1,1,1,1,1,
+                             1,1,1,1,1,1,1)
+  vertex_attr(g,"vertex_value") <- c(2,2,2,2,3,3,3,3,1)
+  
+  z <- data.frame(name = vertex_attr(g,"name"),
+                  l1 = c(1,1,1,1,1,1,1,1,1),
+                  l3 = c(2,2,2,2,3,3,3,3,4),
+                  stringsAsFactors = FALSE)
+  
+  m <- distances(graph = g, weights = edge_attr(g,"value"))
+  
+  # Action
+  z <- merge_communities(
+    z = z,
+    g = g,
+    m = m,
+    at_level = "l3",
+    assign_level = "l2",
+    vertex_attribute = "vertex_value",
+    vertex_aggregate_func = sum,
+    vertex_aggregate_lower_threshold = 0,
+    vertex_aggregate_upper_threshold = 100,
+    edge_attribute = "edge_value",
+    cost_aggregate_func = max,
+    cost_lower_threshold = 2,
+    cost_upper_threshold = Inf,
+    parent_level = "l1",
+    vertex_aggregate_args = list(na.rm = TRUE),
+    penalty = function(x){return(x)},
+    verbose = FALSE)
+  
+  # Assert
+  expect_vector(
+    object = unique(z$l2),
+    ptype = character(),
+    size = 2L)
+})

@@ -259,6 +259,6 @@ merge_communities <- function(
       }
     }
   }
-  if (verbose) { cat(sprintf("\n Total zones merged: %s\n", counter)) }
+  if (verbose) { cat(sprintf("\nTotal zones merged: %s\n", counter)) }
   return(z)
 }
