@@ -11,8 +11,8 @@
 #' @param vertex_aggregate_upper_threshold Numeric value indicating the upper threshold of the vertex aggregate. Zones with aggregate value smaller than this value will attempt to merge with an adjacent zone.
 #' @param edge_attribute Character value which indicates the edge attribute to be used for merge algorithm.
 #' @param cost_aggregate_func Function to aggregate edge attributes. Optional `...` parameters may be passed onto this function in `cost_aggregate_args`.
-#' @param cost_lower_threshold Numeric value indicating the lower threshold of the cost aggregate. Zones with aggregate value greater than this value will attempt to merge with an adjacent zone.
-#' @param cost_upper_threshold Numeric value indicating the upper threshold of the cost aggregate. Zones with aggregate value smaller than this value will attempt to merge with an adjacent zone.
+#' @param cost_lower_threshold Numeric value indicating the lower threshold of the cost aggregate. Proposed  zones with aggregate value greater than this value will proceed with merging.
+#' @param cost_upper_threshold Numeric value indicating the upper threshold of the cost aggregate. Proposed  zones with aggregate value smaller than this value will proceed with merging.
 #' @param parent_level Character value indicating the parent level to stay within. Zones defined at `at_level` will attempt to merge with an adjacent zone only if the target adjacent zone shares the same parent zone at `parent_level`.
 #' @param within_zones Optional parameter. Vector of characters indicating names of zones to detect community within. Default value is `NULL` which will process all zones at the level specified in `at_level`.
 #' @param penalty A function which takes one numeric vector as input. Implements appropriate transformation and penalty. The output is used to calculate graph modularity in the algorithm. Please implement your own penalty function depending on what `edge_attribute` is being used.
@@ -37,9 +37,9 @@
 #' # The `merge_communities()` function in this example will merge small zones
 #' # at `l4` back into larger ones at `l3`. It will attempt to merge `l4` zones 
 #' # with total population between 0-75000. Those zones will attempt to merge
-#' #  with the most optimally-connected adjacent zone, as indicated by the
-#' #  modularity function. They will only merge if the adjacency cost matrix
-#' # (95 percentile travel duration) is above 2 hours and below +Inf. 
+#' # with the most optimally-connected adjacent zone, as indicated by the
+#' # modularity function. They will only merge if the cost of the proposed zone
+#' # (i.e. 95 percentile travel duration) is between 0-45 minutes. 
 #' z <- data.frame(name = vertex_attr(BristolBathGraph, "name"),
 #'                 l1 = "SW England",
 #'                 stringsAsFactors = FALSE) %>%
@@ -73,8 +73,8 @@
 #'                     vertex_aggregate_upper_threshold = 75000,
 #'                     edge_attribute = "duration",
 #'                     cost_aggregate_func = quantile,
-#'                     cost_lower_threshold = (60*60*2),
-#'                     cost_upper_threshold = Inf,
+#'                     cost_lower_threshold = 0,
+#'                     cost_upper_threshold = (60*45),
 #'                     parent_level = "l2",
 #'                     cost_aggregate_args = list(probs = 0.95, 
 #'                                                names = FALSE))

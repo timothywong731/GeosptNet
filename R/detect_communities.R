@@ -56,7 +56,7 @@
 #' # The `detect_communities()` function can also be chained using `%>%` symbol,
 #' # since the first argument is always a `data.frame` object. Hierarchy of 
 #' # zones can be easily created in this way. In the following example, the `l2`
-#' # zones with 95 percentile travel time greater than 0.5 hour are split into
+#' # zones with 95 percentile travel time greater than 30 minutes are split into
 #' # smaller ones which will become `l3`.
 #' library(dplyr)
 #' library(magrittr)
@@ -81,7 +81,7 @@
 #'                        func = quantile,
 #'                        probs = 0.95,
 #'                        names = FALSE) %>% 
-#'                        extract(.>(60*60*0.5)) %>%
+#'                        extract(.>(60*30)) %>%
 #'                        names(),
 #'                      max_non_adjacent_path_length = 2)
 #' @references

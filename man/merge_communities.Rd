@@ -49,9 +49,9 @@ merge_communities(
 
 \item{cost_aggregate_func}{Function to aggregate edge attributes. Optional `...` parameters may be passed onto this function in `cost_aggregate_args`.}
 
-\item{cost_lower_threshold}{Numeric value indicating the lower threshold of the cost aggregate. Zones with aggregate value greater than this value will attempt to merge with an adjacent zone.}
+\item{cost_lower_threshold}{Numeric value indicating the lower threshold of the cost aggregate. Proposed  zones with aggregate value greater than this value will proceed with merging.}
 
-\item{cost_upper_threshold}{Numeric value indicating the upper threshold of the cost aggregate. Zones with aggregate value smaller than this value will attempt to merge with an adjacent zone.}
+\item{cost_upper_threshold}{Numeric value indicating the upper threshold of the cost aggregate. Proposed  zones with aggregate value smaller than this value will proceed with merging.}
 
 \item{parent_level}{Character value indicating the parent level to stay within. Zones defined at `at_level` will attempt to merge with an adjacent zone only if the target adjacent zone shares the same parent zone at `parent_level`.}
 
@@ -87,9 +87,9 @@ my_quickest_paths <- distances(graph = BristolBathGraph,
 # The `merge_communities()` function in this example will merge small zones
 # at `l4` back into larger ones at `l3`. It will attempt to merge `l4` zones 
 # with total population between 0-75000. Those zones will attempt to merge
-#  with the most optimally-connected adjacent zone, as indicated by the
-#  modularity function. They will only merge if the adjacency cost matrix
-# (95 percentile travel duration) is above 2 hours and below +Inf. 
+# with the most optimally-connected adjacent zone, as indicated by the
+# modularity function. They will only merge if the cost of the proposed zone
+# (i.e. 95 percentile travel duration) is between 0-45 minutes. 
 z <- data.frame(name = vertex_attr(BristolBathGraph, "name"),
                 l1 = "SW England",
                 stringsAsFactors = FALSE) \%>\%
@@ -123,8 +123,8 @@ z <- data.frame(name = vertex_attr(BristolBathGraph, "name"),
                     vertex_aggregate_upper_threshold = 75000,
                     edge_attribute = "duration",
                     cost_aggregate_func = quantile,
-                    cost_lower_threshold = (60*60*2),
-                    cost_upper_threshold = Inf,
+                    cost_lower_threshold = 0,
+                    cost_upper_threshold = (60*45),
                     parent_level = "l2",
                     cost_aggregate_args = list(probs = 0.95, 
                                                names = FALSE))
