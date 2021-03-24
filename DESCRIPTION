@@ -32,7 +32,8 @@ Suggests:
     rmarkdown,
     maptools, 
     ggrepel,
-    rgeos
+    rgeos,
+    mapproj
 Depends: 
     R (>= 3.5.0)
 VignetteBuilder: 
@@ -41,6 +42,7 @@ VignetteBuilder:
     ggrepel,
     ggnetwork,
     magrittr,
-    rgeos
+    rgeos,
+    mapproj
 NeedsCompilation: no
 Config/testthat/edition: 3
