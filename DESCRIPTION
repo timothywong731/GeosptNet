@@ -29,9 +29,18 @@ Suggests:
     testthat (>= 3.0.0),
     magrittr,
     dplyr,
-    rmarkdown
+    rmarkdown,
+    maptools, 
+    ggrepel,
+    rgeos
 Depends: 
     R (>= 3.5.0)
-VignetteBuilder: knitr
+VignetteBuilder: 
+    knitr,
+    maptools, 
+    ggrepel,
+    ggnetwork,
+    magrittr,
+    rgeos
 NeedsCompilation: no
 Config/testthat/edition: 3
