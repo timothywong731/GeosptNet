@@ -14,6 +14,221 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup}
+## Introduction
+
+In this package we will use the South-West region of England to illustrate how the algorithm works. Several datasets are supplied with the packages:
+
+- `BristolBathGraph` An `igraph` object representing an unidirected graph containing a set of vertexes and edges. In this graph, vertexes represent postcode sectors (e.g. *BS1 1*, *BS1 2*, etc) and edges represent transportation link between the incident vertexes. Vertexes contain an attribute called `population` which is collected from 2011 UK census data. Edges have two attributes `duration` and `distance` representing the transportation cost.
+- `BristolBathPlaces` A `dataframe` object containing the locations of several towns and cities in South-West England.
+- `BristolBathPolygons` A `SpatialPolygons` object of postcode sectors in the South-West region of England.
+
+```{r setup, fig.width=5, fig.height=6, message=FALSE}
+library(sp)
+library(igraph)
 library(GeosptNet)
+BristolBathGraph
+BristolBathPlaces
+plot(BristolBathPolygons)
+```
+
+The `igraph` object `BristolBathGraph` contains many vertexes and edges so it is much easier to visualise a subset of it. We may use the `induced_subgraph()` function in the `igraph` pachage to select a smaller part of the graph. The graph can be easily visualised using vanilla `plot()` function or visualised using `ggplot2` and `ggnetwork` packages. The example below shows all postcode sectors within the **BA1** area.
+
+In practice, the road distance and travel time can be retrived using commercial API (e.g. [Google Distance Matrix API](https://developers.google.com/maps/documentation/distance-matrix/overview)) or derived using [OSRM](https://github.com/riatelab/osrm).
+
+```{r, fig.width=7, fig.height=5, message=FALSE}
+library(dplyr)
+library(ggplot2)
+library(ggnetwork)
+set.seed(1000)
+BristolBathGraph %>%
+  induced_subgraph(vids = which(grepl("^(BA1 )", vertex_attr(., "name")))) %>%
+  ggplot(aes(x = x, y = y, xend = xend, yend = yend)) +
+  geom_edges(colour="grey20") +
+  geom_nodes(aes(size=population), colour="grey60") +
+  geom_nodetext(aes(label=name), color = "blue", size=3) +
+  geom_edgetext(aes(label=sprintf("%s mins\n(%s km)", round(duration/60), round(distance/1000))),
+                size = 3) +
+  theme_blank()
+```
+
+Many parts of the algorithm requires using a \(N \times N\) cost matrix so this is pre-calculated and stored as an object . The example below calculates the shortest travel duration to and from any vertexes in the graph.
+
+```{r}
+my_quickest_paths <- distances(
+  graph = BristolBathGraph,
+  weights = edge_attr(BristolBathGraph, "duration"))
+
+# Visualise part of the matrix
+my_quickest_paths[1:10, 1:10]
+```
+
+## Detecting Communities
+
+This package has two core functions `detect_communities()` and `merge_communities()`. Both functions accept multiple parameters with the first argument being a `data.frame` (or `tibble`) object, which means both functions are fully compatible with the pipe operator `%>%`. 
+
+The example below shows how to split a single region (i.e. `SW England` in this case)  into multiple smaller regions. The first function call shows a simple example of using `detect_communities()` to split `l1` zones (i.e. the highest level) into multiple smaller zones at `l2`. It uses `igraph::cluster_louvain()` to determine membership of the graph communities.
+
+The second function call show how optional parameters can be used. In particular, the `allow_exit_zone` value is set to `TRUE` which means transportation links between non adjacent vertexes may be allowed up to the length specified by the optional parameter `max_non_adjacent_path_length`. The parameter `within_zones` is set to a character vector containing names of the `l2` zones which we wish to split further. In this example, the names of the `l2` zones are dynamically calculated by the function `get_matrix_aggregate()`. This will use the matrix input `my_quickest_paths` to calculate the 95<sup>th</sup> percentile of the quickest travel duration within all `l2` zones and return only those which exceed 30 minutes threshold, only those `l2` zones satisfying the threshold will be split further down into smaller zones at `l4`.
+
+```{r}
+library(magrittr)
+
+z <- tibble(
+    name = vertex_attr(BristolBathGraph, "name"),
+    l1 = "SW England") %>%
+  detect_communities(
+    g = BristolBathGraph,
+    at_level = "l1",
+    assign_level = "l2",
+    edge_attribute = "duration") %>%
+  detect_communities(
+    g = BristolBathGraph,
+    at_level = "l2",
+    assign_level = "l4",
+    edge_attribute = "duration",
+    allow_exit_zone = TRUE,
+    m = my_quickest_paths,
+    max_non_adjacent_path_length = 2,
+    within_zones = get_matrix_aggregate(
+      g = BristolBathGraph,
+      m = my_quickest_paths,
+      groups = .[["l2"]],
+      func = quantile,
+      probs = 0.95,
+      names = FALSE) %>% 
+      extract(.>(60*60*0.5)) %>%
+      names())
+
+z
+```
+
+## Merging Communities
+
+Smaller zones at low level can be merged to create larger zone at high level using the function `merge_communities()`. The algorithm will calculate the vertex aggregate value specified by parameters `vertex_attribute`, `vertex_aggregate_func`,`vertex_aggregate_lower_threshold`, `vertex_aggregate_upper_threshold` and `vertex_aggregate_args` (optional). All the zones which satisfy the conditions will be ranked and attempt to merge with one of its adjacent zone which shares the same parent zone at `parent_level`. Modularity function is used to compare which adjacent zone it should merge with. The algorithm will then calculate the cost aggregate value of the proposed zone specified by `cost_aggregate_func` and `cost_aggregate_args` (optional). The proposed zones will only be created if the cost aggregate value is within the range set by `cost_lower_threshold` and `cost_upper_threshold`.
+
+The following code demonstrates using `merge_communities()` to merge  smaller `l4` zones into large zones at `l3`. In this example, all `l4` zones with total population between 0-75000 will attempt to merge with one of their adjacent zones. Merging will proceed if the 95<sup>th</sup> percentile travel duration of the proposed zone is between 0-45 minutes.
+
+```{r}
+z <- z %>%
+  merge_communities(
+    g = BristolBathGraph,
+    m = my_quickest_paths,
+    at_level = "l4",
+    assign_level = "l3",
+    vertex_attribute = "population",
+    vertex_aggregate_func = sum,
+    vertex_aggregate_lower_threshold = 0,
+    vertex_aggregate_upper_threshold = 75000,
+    edge_attribute = "duration",
+    cost_aggregate_func = quantile,
+    cost_lower_threshold = 0,
+    cost_upper_threshold = (60*45),
+    parent_level = "l2",
+    cost_aggregate_args = list(probs = 0.95, 
+                               names = FALSE),
+    verbose = TRUE)
+
+z
+```
+
+Let's calculate the number of distinct zones at each level:
+```{r}
+summarise_all(z,function(x){ length(unique(x)) })
+```
+## Visualisation
+
+The `SpatialPolygons` object `BristolBathPolygons` can be merged using `maptools::unionSpatialPolygons()`. Afterwards it can be converted into `data frame` by `fortify()` and visualised using `ggplot2`.
+
+```{r, fig.width=8, fig.height=10}
+library(ggrepel)
+library(maptools)
+
+l1_polygons <- unionSpatialPolygons(
+  SpP = BristolBathPolygons,
+  IDs = z[match(BristolBathPolygons$Name,z$name),]$l1)
+l2_polygons <- unionSpatialPolygons(
+  SpP = BristolBathPolygons,
+  IDs = z[match(BristolBathPolygons$Name,z$name),]$l2)
+l3_polygons <- unionSpatialPolygons(
+  SpP = BristolBathPolygons,
+  IDs = z[match(BristolBathPolygons$Name,z$name),]$l3)
+l4_polygons <- unionSpatialPolygons(
+  SpP = BristolBathPolygons,
+  IDs = z[match(BristolBathPolygons$Name,z$name),]$l4)
+
+bind_rows(mutate(fortify(l1_polygons), level="l1"),
+          mutate(fortify(l2_polygons), level="l2"),
+          mutate(fortify(l3_polygons), level="l3"),
+          mutate(fortify(l4_polygons), level="l4")) %>%
+  ggplot() +
+  geom_polygon(aes(x=long, y=lat, group=group, fill=id), 
+               colour="black", size=0.05)+
+  geom_label_repel(aes(x=long, y=lat,label=place),
+                   size=3, label.size = 0.2,
+                   BristolBathPlaces)+
+  geom_point(aes(x=long, y=lat), BristolBathPlaces)+
+  coord_map() +
+  facet_wrap("level",ncol = 2) +
+  scale_fill_viridis_d() +
+  theme(legend.position = "none")
+```
+
+Further details of zones at a particular level can be calculated and passed onto `ggplot2` for visualisation.
+
+```{r}
+library(rgeos)
+
+zone_centroids <- gCentroid(l3_polygons, byid = TRUE) %>%
+  as.data.frame() %>%
+  mutate(id=rownames(.)) %>%
+  as_tibble()
+
+zone_populations <- get_vertex_attr_aggregate(
+    g = BristolBathGraph,
+    attr = "population",
+    groups = z[["l3"]],
+    func = sum) %>% 
+  tibble(id=names(.), total_pop=.)
+
+zone_durations <- get_matrix_aggregate(
+    g = BristolBathGraph,
+    m = my_quickest_paths,
+    groups = z[["l3"]],
+    func = quantile,
+    probs = 0.95,
+    names = FALSE) %>% 
+  tibble(id=names(.), duration_perc95=.)
+
+zone_summary <- zone_centroids %>%
+  inner_join(zone_populations, by="id") %>%
+  inner_join(zone_durations, by="id") %>%
+  mutate(label_text = sprintf(fmt = "%s mins\nPop: %s", round(duration_perc95/60), total_pop))
+
+zone_summary
+```
+
+The 95<sup>th</sup> percentile travel duration and total population are visualised for all zones at `l3`.
+
+```{r, fig.width=8, fig.height=8}
+ggplot() +
+  geom_polygon(aes(x=long, y=lat, group=group, fill=total_pop), 
+               data = l3_polygons %>%
+                        fortify() %>%
+                        inner_join(zone_populations, by="id"),
+               colour="black", size=0.05) +
+  geom_label_repel(aes(x=x, y=y,label=label_text),
+                   data = zone_summary,
+                   box.padding   = 0.8, 
+                   label.padding = 0.2,
+                   force = 20,
+                   alpha=0.8,
+                   size=3, 
+                   label.size = 0.2) +
+  coord_map() +
+  scale_fill_viridis_c() +
+  labs(fill= "Zonal Population",
+       x="Longitude",
+       y="Latitude",
+       title = "L3 Zones") +
+  theme(legend.position = "right")
 ```
