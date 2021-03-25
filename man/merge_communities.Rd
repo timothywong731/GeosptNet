@@ -71,6 +71,9 @@ A `data frame` object
 \description{
 Merge smaller zones to create larger ones.
 }
+\details{
+Merges zones at lower level into larger zones at a higher level. The function uses `igraph::modularity()` to measure effectiveness of the zones.
+}
 \examples{
 library(igraph)
 library(dplyr)

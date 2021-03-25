@@ -45,6 +45,9 @@ A `data frame` object
 \description{
 Runs community detection algorithm to identify communities in a graph.
 }
+\details{
+Splits zones at high level into smaller zones at a lower level. The function uses `igraph::cluster_louvain()` as the internal clustering algorithm.
+}
 \examples{
 library(igraph)
 # Create a data frame object with vertex name
