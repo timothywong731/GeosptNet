@@ -1,5 +1,6 @@
 #' @title Merge Communities in a Graph
 #' @description Merge smaller zones to create larger ones.
+#' @details Merges zones at lower level into larger zones at a higher level. The function uses `igraph::modularity()` to measure effectiveness of the zones.
 #' @param z A `data frame` object containing character column `name` which contains all vertex names in graph `g`, and at least one named column of characters indicating zones to be merged.
 #' @param g An `igraph` object
 #' @param m An adjacency matrix of numeric values. The number of column and rows must be identical. All rows and columns must be named. Ideally this is a `N*N` shortest path distance matrix.
