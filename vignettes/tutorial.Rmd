@@ -1,6 +1,7 @@
 ---
 title: "Getting Started with GeosptNet"
 output: rmarkdown::html_vignette
+author: Timothy Wong
 vignette: >
   %\VignetteIndexEntry{Getting Started with GeosptNet}
   %\VignetteEngine{knitr::rmarkdown}
@@ -64,7 +65,20 @@ my_quickest_paths[1:10, 1:10]
 
 ## Detecting Communities
 
-This package has two core functions `detect_communities()` and `merge_communities()`. Both functions accept multiple parameters with the first argument being a `data.frame` (or `tibble`) object, which means both functions are fully compatible with the pipe operator `%>%`. 
+This package has two core functions `detect_communities()` and `merge_communities()`. Both require edge attribute as input parameter. Since we used `igraph::cluster_louvain()` as the internal clustering algorithm, this means larger edge weights correspond to stronger connections and all edge weights must be positive. The desired edge attribute `duration` needs to be transformed accordingly to reflect correct weights. The code below shows a custom function `penalty_func()` which penalise long travel time and reward short travel time. The penalty amount caan easily be modified in the function.
+
+```{r, fig.width=6, fig.height=4}
+penalty_func <- function(x){
+   log(scales::rescale(-x)+1)^6
+}
+
+plot(x = 0:3600,
+     y = penalty_func(0:3600),
+     xlab="Travel duration (seconds)", 
+     ylab="Penalised edge weights")
+```
+
+Both functions `detect_communities()` and `merge_communities()` accept multiple parameters with the first argument being a `data.frame` (or `tibble`) object, which means both functions are fully compatible with the pipe operator `%>%`.
 
 The example below shows how to split a single region (i.e. `SW England` in this case)  into multiple smaller regions. The first function call shows a simple example of using `detect_communities()` to split `l1` zones (i.e. the highest level) into multiple smaller zones at `l2`. It uses `igraph::cluster_louvain()` to determine membership of the graph communities.
 
@@ -80,7 +94,8 @@ z <- tibble(
     g = BristolBathGraph,
     at_level = "l1",
     assign_level = "l2",
-    edge_attribute = "duration") %>%
+    edge_attribute = "duration",
+    penalty = penalty_func) %>%
   detect_communities(
     g = BristolBathGraph,
     at_level = "l2",
@@ -89,6 +104,7 @@ z <- tibble(
     allow_exit_zone = TRUE,
     m = my_quickest_paths,
     max_non_adjacent_path_length = 2,
+    penalty = penalty_func,
     within_zones = get_matrix_aggregate(
       g = BristolBathGraph,
       m = my_quickest_paths,
@@ -126,6 +142,7 @@ z <- z %>%
     parent_level = "l2",
     cost_aggregate_args = list(probs = 0.95, 
                                names = FALSE),
+    penalty = penalty_func,
     verbose = TRUE)
 
 z
