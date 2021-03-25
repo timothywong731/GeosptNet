@@ -182,7 +182,7 @@ test_that("Name column not equal length", {
 })
 
 
-test_that("within_zones is non-NULL", {
+test_that("within_parents is non-NULL", {
   # Arrange
   g <- graph_from_literal(A--B, B--C, C--D, C--A, D--A, D--B,
                           A--E,
@@ -214,7 +214,7 @@ test_that("within_zones is non-NULL", {
     cost_aggregate_func = max,
     cost_lower_threshold = 0,
     cost_upper_threshold = 4,
-    within_zones = 1,
+    within_parents = 1,
     parent_level = "l1",
     penalty = function(x){x},
     verbose = FALSE)
@@ -241,7 +241,7 @@ test_that("within_zones is non-NULL", {
 })
 
 
-test_that("within_zones not exist in the data frame", {
+test_that("within_parents not exist in the data frame", {
   # Arrange
   g <- graph_from_literal(A--B, B--C, C--D, C--A, D--A, D--B,
                           A--E,
@@ -273,7 +273,7 @@ test_that("within_zones not exist in the data frame", {
     cost_aggregate_func = max,
     cost_lower_threshold = 0,
     cost_upper_threshold = 4,
-    within_zones = 2,
+    within_parents = 2,
     parent_level = "l1",
     penalty = function(x){x},
     verbose = FALSE)
