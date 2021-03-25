@@ -32,7 +32,8 @@ Suggests:
     maptools, 
     ggrepel,
     rgeos,
-    mapproj
+    mapproj,
+    scales
 Depends: 
     R (>= 3.5.0)
 VignetteBuilder: 
@@ -42,6 +43,7 @@ VignetteBuilder:
     ggnetwork,
     magrittr,
     rgeos,
-    mapproj
+    mapproj,
+    scales
 NeedsCompilation: no
 Config/testthat/edition: 3
