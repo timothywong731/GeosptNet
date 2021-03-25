@@ -7,7 +7,6 @@ Authors@R:
     email = "timothy.wong@hotmail.co.uk",
     role = c("aut", "cre"),
     comment = c(ORCID = "0000-0003-1943-6448"))
-Author: Timothy Wong [aut, cre]
 Maintainer: Timothy Wong <timothy.wong@hotmail.co.uk>
 Description: Performs geospatial network analysis such as community discovery.
 BugReports: https://github.com/timothywong731/GeosptNet/issues
