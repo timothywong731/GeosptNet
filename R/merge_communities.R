@@ -14,7 +14,7 @@
 #' @param cost_lower_threshold Numeric value indicating the lower threshold of the cost aggregate. Proposed  zones with aggregate value greater than this value will proceed with merging.
 #' @param cost_upper_threshold Numeric value indicating the upper threshold of the cost aggregate. Proposed  zones with aggregate value smaller than this value will proceed with merging.
 #' @param parent_level Character value indicating the parent level to stay within. Zones defined at `at_level` will attempt to merge with an adjacent zone only if the target adjacent zone shares the same parent zone at `parent_level`.
-#' @param within_zones Optional parameter. Vector of characters indicating names of zones to detect community within. Default value is `NULL` which will process all zones at the level specified in `at_level`.
+#' @param within_parents Optional parameter. Vector of characters indicating names of zones to detect community within at `parent_level`. Default value is `NULL` which will process all zones at `parent_level`.
 #' @param penalty A function which takes one numeric vector as input. Implements appropriate transformation and penalty. The output is used to calculate graph modularity in the algorithm. Please implement your own penalty function depending on what `edge_attribute` is being used.
 #' @param vertex_aggregate_args A named list of additional parameters to be passed onto `vertex_aggregate_func`.
 #' @param cost_aggregate_args A named list of additional parameters to be passed onto `cost_aggregate_func`.
@@ -29,7 +29,10 @@
 #' my_quickest_paths <- distances(graph = BristolBathGraph,
 #'                                weights = edge_attr(BristolBathGraph,
 #'                                                    "duration"))
-#'
+#' 
+#' # Define custom penalty function
+#' penalty_func <- function(x){return(scales::rescale(-x))}
+#' 
 #' # This will split the top level zone `l1` into smaller zones at `l2`
 #' # The `l2` zones with 95 percentile travel time greater than 0.5 hour 
 #' # are split into smaller ones which will become `l4`.
@@ -46,7 +49,8 @@
 #'   detect_communities(g = BristolBathGraph,
 #'                      at_level = "l1",
 #'                      assign_level = "l2",
-#'                      edge_attribute = "duration") %>%
+#'                      edge_attribute = "duration",
+#'                      penalty = penalty_func) %>%
 #'   detect_communities(g = BristolBathGraph,
 #'                      at_level = "l2",
 #'                      assign_level = "l4",
@@ -60,9 +64,10 @@
 #'                        func = quantile,
 #'                        probs = 0.95,
 #'                        names = FALSE) %>% 
-#'                        extract(.>(60*60*0.5)) %>%
+#'                        extract(.>(60*30)) %>%
 #'                        names(),
-#'                      max_non_adjacent_path_length = 2) %>%
+#'                      max_non_adjacent_path_length = 2,
+#'                      penalty = penalty_func) %>%
 #'   merge_communities(g = BristolBathGraph,
 #'                     m = my_quickest_paths,
 #'                     at_level = "l4",
@@ -77,7 +82,8 @@
 #'                     cost_upper_threshold = (60*45),
 #'                     parent_level = "l2",
 #'                     cost_aggregate_args = list(probs = 0.95, 
-#'                                                names = FALSE))
+#'                                                names = FALSE),
+#'                     penalty = penalty_func) 
 #' @references
 #' \itemize{
 #' \item Modularity \cr
@@ -99,8 +105,8 @@ merge_communities <- function(
   cost_lower_threshold,
   cost_upper_threshold,
   parent_level,
-  within_zones = NULL,
-  penalty = function(x){ base::log(scales::rescale(-x)+1)^6 },
+  within_parents = NULL,
+  penalty = function(x){ return(x) },
   vertex_aggregate_args = list(),
   cost_aggregate_args = list(),
   verbose = TRUE
@@ -177,9 +183,9 @@ merge_communities <- function(
                                       func = vertex_aggregate_func),
                                  vertex_aggregate_args))
     
-    if (!base::is.null(within_zones)) {
+    if (!base::is.null(within_parents)) {
       # Merge only these zones
-      zonal_aggregate <- zonal_aggregate[base::names(zonal_aggregate) %in% base::unique(reference[reference[[parent_level]] %in% within_zones,]$hash)]
+      zonal_aggregate <- zonal_aggregate[base::names(zonal_aggregate) %in% base::unique(reference[reference[[parent_level]] %in% within_parents,]$hash)]
     }
     
     zone_hashes <- base::sort(zonal_aggregate[
@@ -208,7 +214,8 @@ merge_communities <- function(
       adjacent_zones <- base::setdiff(base::unique(z[base::match(base::intersect(parent_vertexes, adjacent_vertexes), z$name),][[assign_level]]), zone)
       
       if (base::length(adjacent_zones) < 1) {
-        # There are no adjacent zones. This is probably an island.
+        # There are no adjacent zones. This is probably an island...
+        # ... or perhaps the parent zone contains only one child zone.
         next
       }
       

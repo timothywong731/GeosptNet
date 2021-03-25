@@ -19,8 +19,8 @@ merge_communities(
   cost_lower_threshold,
   cost_upper_threshold,
   parent_level,
-  within_zones = NULL,
-  penalty = function(x) {     base::log(scales::rescale(-x) + 1)^6 },
+  within_parents = NULL,
+  penalty = function(x) {     return(x) },
   vertex_aggregate_args = list(),
   cost_aggregate_args = list(),
   verbose = TRUE
@@ -55,7 +55,7 @@ merge_communities(
 
 \item{parent_level}{Character value indicating the parent level to stay within. Zones defined at `at_level` will attempt to merge with an adjacent zone only if the target adjacent zone shares the same parent zone at `parent_level`.}
 
-\item{within_zones}{Optional parameter. Vector of characters indicating names of zones to detect community within. Default value is `NULL` which will process all zones at the level specified in `at_level`.}
+\item{within_parents}{Optional parameter. Vector of characters indicating names of zones to detect community within at `parent_level`. Default value is `NULL` which will process all zones at `parent_level`.}
 
 \item{penalty}{A function which takes one numeric vector as input. Implements appropriate transformation and penalty. The output is used to calculate graph modularity in the algorithm. Please implement your own penalty function depending on what `edge_attribute` is being used.}
 
@@ -80,6 +80,9 @@ my_quickest_paths <- distances(graph = BristolBathGraph,
                                weights = edge_attr(BristolBathGraph,
                                                    "duration"))
 
+# Define custom penalty function
+penalty_func <- function(x){return(scales::rescale(-x))}
+
 # This will split the top level zone `l1` into smaller zones at `l2`
 # The `l2` zones with 95 percentile travel time greater than 0.5 hour 
 # are split into smaller ones which will become `l4`.
@@ -96,7 +99,8 @@ z <- data.frame(name = vertex_attr(BristolBathGraph, "name"),
   detect_communities(g = BristolBathGraph,
                      at_level = "l1",
                      assign_level = "l2",
-                     edge_attribute = "duration") \%>\%
+                     edge_attribute = "duration",
+                     penalty = penalty_func) \%>\%
   detect_communities(g = BristolBathGraph,
                      at_level = "l2",
                      assign_level = "l4",
@@ -110,9 +114,10 @@ z <- data.frame(name = vertex_attr(BristolBathGraph, "name"),
                        func = quantile,
                        probs = 0.95,
                        names = FALSE) \%>\% 
-                       extract(.>(60*60*0.5)) \%>\%
+                       extract(.>(60*30)) \%>\%
                        names(),
-                     max_non_adjacent_path_length = 2) \%>\%
+                     max_non_adjacent_path_length = 2,
+                     penalty = penalty_func) \%>\%
   merge_communities(g = BristolBathGraph,
                     m = my_quickest_paths,
                     at_level = "l4",
@@ -127,7 +132,8 @@ z <- data.frame(name = vertex_attr(BristolBathGraph, "name"),
                     cost_upper_threshold = (60*45),
                     parent_level = "l2",
                     cost_aggregate_args = list(probs = 0.95, 
-                                               names = FALSE))
+                                               names = FALSE),
+                    penalty = penalty_func) 
 }
 \references{
 \itemize{
